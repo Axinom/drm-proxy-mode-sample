@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Shaka Player DRM Playback</title>
+		<!-- Shaka Player library -->
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.1/shaka-player.compiled.js"
+			integrity="sha512-N+ctQP8zL8qXXNmHlw43IMVno5NaWWsEhLs+4mlk1Ffm+BnPxAMDR6hvqitZLR4lfWCyTOax8YOqnVC1vjgCbA=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		></script>
+	</head>
+	<body>
+		<div>
+			<video id="video" width="640" height="360" controls></video>
+		</div>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+				shaka.polyfill.installAll()
+				if (shaka.Player.isBrowserSupported()) {
+					initPlayer()
+				} else {
+					console.error('Browser not supported!')
+				}
+			})
+
+			async function initPlayer() {
+				const videoElement = document.getElementById('video')
+
+				const player = new shaka.Player(videoElement)
+
+				//single key
+				// const id = 'bcbf3075-9da6-478f-bbb6-5ad869179950'
+				// const manifestUri ='https://855a9fc3487ea8637e749dd9.blob.core.windows.net/video-output/MNvMTmUpQxT8wKy4nqcF4d/dash/manifest.mpd'
+
+				//multi-key
+				const id = '3af89f70-7b5e-4ece-b12a-87d550661b5a'
+				const manifestUri =
+					'https://855a9fc3487ea8637e749dd9.blob.core.windows.net/video-output/6AF6FsgTSeyjQqQdoBp2pt/dash/manifest.mpd'
+
+				player.configure({
+					drm: {
+						servers: {
+							'com.widevine.alpha': `http://127.0.0.1:3000/widevine/${id}`,
+							'com.microsoft.playready': `http://127.0.0.1:3000/playready/${id}`,
+						},
+					},
+				})
+				try {
+					await player.load(manifestUri)
+					console.log('Video loaded successfully!')
+				} catch (error) {
+					console.error('Error loading video:', error)
+				}
+			}
+		</script>
+	</body>
+</html>
